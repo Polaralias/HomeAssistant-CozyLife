@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="custom_components/cozylife/assets/logo.png" alt="CozyLife logo" width="320" />
+</p>
+
 # Cozylife integration for Home Assistant
 
 > Maintained by [Polaralias](https://github.com/Polaralias).
