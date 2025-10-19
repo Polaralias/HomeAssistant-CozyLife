@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="custom_components/cozylife/assets/logo.png" alt="CozyLife logo" width="320" />
+  <img src="https://raw.githubusercontent.com/Polaralias/HomeAssistant-CozyLife/main/custom_components/cozylife/assets/logo.png" alt="CozyLife logo" width="320" />
 </p>
 
 # Cozylife integration for Home Assistant
