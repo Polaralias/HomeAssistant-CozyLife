@@ -3,6 +3,7 @@ import json
 import socket
 import time
 from typing import Optional, Union, Any
+from pathlib import Path
 import logging
 try:
   from .utils import get_pid_list, get_sn
@@ -45,10 +46,12 @@ class tcp_client(object):
     _dpid = []
     # last sn
     _sn = str
+    _model_path: Optional[Path] = None
 
-    def __init__(self, ip, timeout=3):
+    def __init__(self, ip, timeout=3, model_path: Optional[Path] = None):
         self._ip = ip
         self.timeout = timeout
+        self._model_path = model_path
 
     def disconnect(self):
         if self._connect:
@@ -135,7 +138,13 @@ class tcp_client(object):
 
         self._pid = resp_json['msg']['pid']
 
-        pid_list = get_pid_list()
+        if not self._model_path:
+            _LOGGER.error(
+                "Model path not provided to tcp_client, cannot look up device PID."
+            )
+            return
+
+        pid_list = get_pid_list(self._model_path)
         for item in pid_list:
             match = False
             for item1 in item['device_model']:

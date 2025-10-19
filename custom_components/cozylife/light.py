@@ -6,6 +6,7 @@ import asyncio
 import logging
 import time
 from datetime import timedelta
+from pathlib import Path
 from typing import Any
 
 import voluptuous as vol
@@ -89,9 +90,12 @@ async def async_setup_entry(
     switches: list[CozyLifeSwitchAsLight] = []
 
     timeout = data.get("timeout", entry.data.get("timeout", 0.3))
+    model_path = Path(hass.config.path("custom_components", DOMAIN, "model.json"))
 
     if device := data.get("device"):
-        client = tcp_client(device.get("ip"), timeout=timeout)
+        client = tcp_client(
+            device.get("ip"), timeout=timeout, model_path=model_path
+        )
         client._device_id = device.get("did")
         client._pid = device.get("pid")
         client._dpid = device.get("dpid")
@@ -138,7 +142,9 @@ async def async_setup_entry(
             if not device_info:
                 continue
 
-            client = tcp_client(device_info.get("ip"), timeout=timeout)
+            client = tcp_client(
+                device_info.get("ip"), timeout=timeout, model_path=model_path
+            )
             client._device_id = device_info.get("did")
             client._pid = device_info.get("pid")
             client._dpid = device_info.get("dpid")
@@ -185,7 +191,9 @@ async def async_setup_entry(
     else:
         devices = data.get("devices", {})
         for item in devices.get("lights", []):
-            client = tcp_client(item.get("ip"), timeout=timeout)
+            client = tcp_client(
+                item.get("ip"), timeout=timeout, model_path=model_path
+            )
             client._device_id = item.get("did")
             client._pid = item.get("pid")
             client._dpid = item.get("dpid")
