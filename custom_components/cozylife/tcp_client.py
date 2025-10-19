@@ -53,6 +53,17 @@ class tcp_client(object):
         self.timeout = timeout
         self._model_path = model_path
 
+        # Ensure all instance attributes are initialised so attribute access
+        # after unsuccessful device info lookups does not raise AttributeError.
+        self._connect = None
+        self._device_id = None
+        self._pid = None
+        self._device_type_code = None
+        self._icon = None
+        self._device_model_name = None
+        self._dpid = []
+        self._sn = ""
+
     def disconnect(self):
         if self._connect:
             try: 
@@ -150,9 +161,9 @@ class tcp_client(object):
             for item1 in item['device_model']:
                 if item1['device_product_id'] == self._pid:
                     match = True
-                    self._icon = item1['icon']
-                    self._device_model_name = item1['device_model_name']
-                    self._dpid = item1['dpid']
+                    self._icon = item1.get('icon')
+                    self._device_model_name = item1.get('device_model_name')
+                    self._dpid = item1.get('dpid', [])
                     break
 
             if match:
