@@ -2,11 +2,9 @@ import json
 import time
 import logging
 from pathlib import Path
+from typing import Optional
 
 _LOGGER = logging.getLogger(__name__)
-
-MODEL_PATH = Path(__file__).with_name('model.json')
-
 
 def get_sn() -> str:
     """
@@ -17,30 +15,32 @@ def get_sn() -> str:
 
 # cache get_pid_list result for many calls
 _CACHE_PID = []
+_CACHE_PID_PATH: Optional[Path] = None
 
-def get_pid_list(lang='en') -> list:
+
+def get_pid_list(model_path: Path, lang='en') -> list:
     """
     http://doc.doit/project-12/doc-95/
     :param lang:
     :return:
     """
-    global _CACHE_PID
-    if len(_CACHE_PID) != 0:
+    global _CACHE_PID, _CACHE_PID_PATH
+    if len(_CACHE_PID) != 0 and _CACHE_PID_PATH == model_path:
         return _CACHE_PID
 
     try:
-        raw = MODEL_PATH.read_text(encoding='utf-8')
+        raw = model_path.read_text(encoding='utf-8')
     except FileNotFoundError:
-        _LOGGER.error('Local device model cache not found: %s', MODEL_PATH)
+        _LOGGER.error('Local device model cache not found: %s', model_path)
         return []
     except OSError as err:
-        _LOGGER.error('Unable to read local device model cache %s: %s', MODEL_PATH, err)
+        _LOGGER.error('Unable to read local device model cache %s: %s', model_path, err)
         return []
 
     try:
         pid_list = json.loads(raw)
     except json.JSONDecodeError as err:
-        _LOGGER.error('Error decoding local device model cache %s: %s', MODEL_PATH, err)
+        _LOGGER.error('Error decoding local device model cache %s: %s', model_path, err)
         return []
 
     if isinstance(pid_list, dict):
@@ -53,4 +53,5 @@ def get_pid_list(lang='en') -> list:
         return []
 
     _CACHE_PID = pid_list
+    _CACHE_PID_PATH = model_path
     return _CACHE_PID
